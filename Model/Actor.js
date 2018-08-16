@@ -10,16 +10,18 @@ var _init = function () {
   }
 }
 
-var _getAllActor = function (resolve, reject) {
-  _init();
-  _actorDb.find({}).toArray((err, newDocs) => {
-    if (err) {
-      console.log('error', err);
-      reject(err);
-    } else {
-      // console.log(newDocs);
-      resolve(newDocs);
-    }
+var _getAllActor = function () {
+  return new Promise(function (resolve, reject) {
+    _init();
+    _actorDb.find({}).toArray((err, newDocs) => {
+      if (err) {
+        console.log('error', err);
+        reject(err);
+      } else {
+        // console.log(newDocs);
+        resolve(newDocs);
+      }
+    });
   });
 }
 
@@ -34,26 +36,44 @@ var _deleteById = function (targetId, resolve, reject) {
   });
 }
 
-var _insertActors = function (newData, reject) {
-  if (newData && newData.length > 0) {
-    _init();
-    _actorDb.insertMany(newData, (err) => {
-      if (err) {
-        reject(err);
-      }
-    });
-  } else {
-    reject();
-  }
+var _insertActors = function (newData) {
+  return new Promise(function (resolve, reject) {
+    if (newData && newData.length > 0) {
+      _init();
+      _actorDb.insertMany(newData, (err) => {
+        if (err) {
+          reject(err);
+        }
+        resolve();
+      });
+    } else {
+      reject();
+    }
+  });
 }
 
-var _updateActors = function (updatedData, reject) {
-  _init();
-  _.forEach(updatedData, ActorRecord => {
-    _actorDb.update({ nNumber: ActorRecord.nNumber, ActorId: ActorRecord.ActorId }, { $set: ActorRecord }, (err) => {
+var _updateMultipleActors = function (updatedData) {
+  return new Promise(function (resolve, reject) {
+    _init();
+    _.forEach(updatedData, actorRecord => {
+      _actorDb.update({ _id: actorRecord._id }, { $set: actorRecord }, (err) => {
+        if (err) {
+          reject(err);
+        }
+        resolve();
+      });
+    });
+  });
+}
+
+var _updateSingleActor = function (actorRecord) {
+  return new Promise(function (resolve, reject) {
+    _init();
+    _actorDb.updateOne({ _id: ObjectID(actorRecord._id) }, { $set: actorRecord }, (err) => {
       if (err) {
         reject(err);
       }
+      resolve();
     });
   });
 }
@@ -133,7 +153,8 @@ module.exports = {
   getAllActor: _getAllActor,
   deleteById: _deleteById,
   insertActors: _insertActors,
-  updateActors: _updateActors,
+  updateMultipleActors: _updateMultipleActors,
+  updateSingleActor: _updateSingleActor,
   findData: _findData,
   getActorsByActorIds: _getActorsByActorIds,
 }

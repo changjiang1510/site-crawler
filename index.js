@@ -54,11 +54,58 @@ function crawlListPage() {
     c.queue(initFullUrl);
     c.on('drain', function () {
       console.log(numPagesVisited, " pages visited.");
+      crawlDetailsPage();
     });
   } catch (error) {
     throw (error);
   }
 }
+
+async function crawlDetailsPage() {
+  try {
+    var c = new Crawler({
+      maxConnections: 10,
+      // This will be called for each crawled page
+      callback: function (error, res, done) {
+        if (error) {
+          console.log(error);
+          throw (error);
+        } else {
+          var $ = res.$;
+          console.log('----------------------');
+          console.log(res.request.uri.href, "visited");
+        }
+        done();
+      }
+    });
+    const actorData = await Actor.getAllActor();
+    actorData.map(actor => {
+      numPagesVisited += 1;
+      c.queue([{
+        uri: `${baseUrl}/${actor.detailUrl}`,
+        callback: function (error, res, done) {
+          if (error) {
+            console.log(error);
+            throw (error);
+          } else {
+            var $ = res.$;
+            console.log('----------------------');
+            console.log(res.request.uri.href, "visited");
+            crawlDetailsPageContent($, actor);
+          }
+          done();
+        }
+      }]);
+      return;
+    })
+    c.on('drain', function () {
+      console.log(numPagesVisited, " pages visited.");
+    });
+  } catch (error) {
+    throw (error);
+  }
+}
+
 
 function visitPage(crawler, urlArray) {
   // Add page to our set
@@ -80,7 +127,7 @@ function collectInternalLinks($) {
   return pagesToVisit;
 }
 
-function crawlListPageContent($) {
+async function crawlListPageContent($) {
   var contentList = $("h2.ttl");
   console.log("Found " + contentList.length + " content cells on page");
   const newActors = [];
@@ -102,9 +149,36 @@ function crawlListPageContent($) {
       }
     );
   });
-  Actor.insertActors(newActors, (err) => {
-    if (err) {
-      console.log(err);
-    }
-  });
+  try {
+    await Actor.insertActors(newActors);
+  } catch (error) {
+    throw(error);
+  }
+}
+
+async function crawlDetailsPageContent($, actor) {
+  var rateTable = $("table.rate-table");
+  const detailsInfo = {};
+  if (rateTable.length>0) {
+    const tableRow = rateTable.find("tr");
+    detailsInfo.rate = [];
+    tableRow.each(function () {
+      const rateCell = $(this).children('td.t9');
+      if(rateCell.length > 0) {
+        detailsInfo.rate.push(
+          {
+            field: rateCell.get(0).children[0].data,
+            score: rateCell.get(1).children[0].data,
+          }
+        );
+      }
+    });
+  }
+  const updatedInfo = Object.assign(detailsInfo, actor);
+  // Update each successful record
+  try {
+    await Actor.updateSingleActor(updatedInfo);
+  } catch (error) {
+    throw (error);
+  }
 }
