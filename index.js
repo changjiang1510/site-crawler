@@ -119,7 +119,7 @@ function collectInternalLinks($) {
   const relativeLinks = $('div.pagination').find("a[href^='/']");
   console.log('Found ', relativeLinks.length, ' relative links on page');
   const pagesToVisit = [];
-  relativeLinks.each(() => {
+  relativeLinks.each(function() {
     const pageUrl = baseUrl + $(this).attr('href');
     if (!(pageUrl in pageList)) {
       pagesToVisit.push(pageUrl);
@@ -133,13 +133,13 @@ async function crawlListPageContent($) {
   const contentList = $('h2.ttl');
   console.log('Found ', contentList.length, ' content cells on page');
   const newActors = [];
-  contentList.each(() => {
+  contentList.each(function() {
     const tagArea = $(this)
       .siblings('.tagarea')
       .find('a');
     const tags = [];
     if (tagArea.length > 0) {
-      tagArea.each(() => {
+      tagArea.each(function() {
         tags.push($(this).text());
       });
     }
@@ -172,7 +172,7 @@ async function crawlDetailsPageContent($, actor) {
   if (rateTable.length > 0) {
     const tableRow = rateTable.find('tr');
     detailsInfo.rate = [];
-    tableRow.each(() => {
+    tableRow.each(function() {
       const rateCell = $(this).children('td.t9');
       if (rateCell.length > 0) {
         detailsInfo.rate.push({
