@@ -176,8 +176,10 @@ async function crawlDetailsPageContent($, actor) {
       const rateCell = $(this).children('td.t9');
       if (rateCell.length > 0) {
         detailsInfo.rate.push({
-          field: rateCell.get(0).children[0].data,
-          score: rateCell.get(1).children[0].data,
+          field:
+            rateCell.get(0).children[0].data ||
+            rateCell.get(0).children[0].children[0].data,
+          score: parseFloat(rateCell.get(1).children[0].data),
         });
       }
     });

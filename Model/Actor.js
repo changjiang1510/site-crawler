@@ -78,12 +78,12 @@ var _updateSingleActor = function (actorRecord) {
   });
 }
 
-var _findData = function (ActorId) {
+var _getActorsByActorId = function (actorId) {
   _init();
   return new Promise(function (resolve, reject) {
-    _actorDb.find({ ActorId: ActorId }).toArray((err, docs) => {
-      if (err || docs.length === 0) {
-        reject(`Not Found : ${ActorId}`);
+    _actorDb.findOne({ _id: new ObjectID(actorId) }, (err, docs) => {
+      if (err || !docs) {
+        reject(`Not Found : ${actorId}`);
       } else {
         resolve(docs);
       }
@@ -91,14 +91,14 @@ var _findData = function (ActorId) {
   });
 }
 
-var _getActorsByActorIds = function (ActorIds, resolve, reject) {
-  if (!_.isArray(ActorIds)) {
+var _getActorsByActorIds = function (actorIds, resolve, reject) {
+  if (!_.isArray(actorIds)) {
     reject();
     return;
   }
 
   _init();
-  _actorDb.find({ ActorId: { '$in': ActorIds } }).toArray((err, docs) => {
+  _actorDb.find({ actorId: { '$in': actorIds } }).toArray((err, docs) => {
     if (err && _.isFunction(reject)) {
       reject(err);
     } else if (_.isFunction(resolve)) {
@@ -155,6 +155,6 @@ module.exports = {
   insertActors: _insertActors,
   updateMultipleActors: _updateMultipleActors,
   updateSingleActor: _updateSingleActor,
-  findData: _findData,
+  getActorsByActorId: _getActorsByActorId,
   getActorsByActorIds: _getActorsByActorIds,
 }
