@@ -7,6 +7,7 @@ import DoneOutlined from '@material-ui/icons/DoneOutlined';
 import 'react-table/react-table.css'
 
 import ActorActions from '../actions/actor';
+import CrawlerActions from '../actions/crawler';
 import TableRow from './TableRow';
 
 const styles = theme => ({
@@ -24,8 +25,11 @@ class ActorList extends Component {
     return actor.actorList;
   }
   getCrawlStatusFromStore() {
-    const { actor } = this.props.store
-    return actor.crawlStatus;
+    const { crawler } = this.props.store
+    return crawler.crawlStatus;
+  }
+  triggerCrawler() {
+    this.props.dispatch(CrawlerActions.crawlActorList());
   }
   navToDetails(event, actorInfo) {
     const { target } = event
@@ -76,6 +80,7 @@ class ActorList extends Component {
             color='primary'
             style={{marginRight: '20px'}}
             disabled={crawlStatus === 'processing'}
+            onClick={this.triggerCrawler.bind(this)}
           >
             Crawl
           </Button>

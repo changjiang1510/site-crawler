@@ -10,7 +10,7 @@ const baseUrl = config.BASE_URL;
 var router = express.Router();
 router.use(bodyParser.json());
 
-router.get('/', async function (req, res) {
+router.get('/list', async function (req, res) {
   req.setTimeout(0);
   try {
     await CrawlHelper.process();

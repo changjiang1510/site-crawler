@@ -4,8 +4,7 @@ const initialState = {
   profile: {},
   actorList: [],
   _loading: false,
-  error: "",
-  crawlStatus: ""
+  error: '',
 };
 
 export default function (state = initialState, action) {
@@ -43,17 +42,6 @@ export default function (state = initialState, action) {
         ...state,
         _loading: false,
         error: action.payload
-      };
-    case ActionTypes.CRAWL_ACTOR_LIST:
-      return {
-        ...state,
-        crawlStatus: 'processing',
-      };
-    case ActionTypes.CRAWL_ACTOR_LIST_SUCCESS:
-      return {
-        ...state,
-        actorList: action.payload.slice(),
-        crawlStatus: 'done',
       };
     default:
       return state;
