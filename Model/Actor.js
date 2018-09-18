@@ -78,7 +78,7 @@ var _updateSingleActor = function (actorRecord) {
   });
 }
 
-var _getActorsByActorId = function (actorId) {
+var _getActorByActorId = function (actorId) {
   _init();
   return new Promise(function (resolve, reject) {
     _actorDb.findOne({ _id: new ObjectID(actorId) }, (err, docs) => {
@@ -155,6 +155,6 @@ module.exports = {
   insertActors: _insertActors,
   updateMultipleActors: _updateMultipleActors,
   updateSingleActor: _updateSingleActor,
-  getActorsByActorId: _getActorsByActorId,
+  getActorByActorId: _getActorByActorId,
   getActorsByActorIds: _getActorsByActorIds,
 }

@@ -30,6 +30,24 @@ const Helper = {
       mainProcess();
     })
   },
+  processDetails(actorId) {
+    var self = this;
+    return new Promise(function (resolve, reject) {
+      const mainProcess = async () => {
+        try {
+          self.numPagesVisited = 0;
+          self.pageList = [];
+          const result = await Actor.getActorByActorId(actorId);
+          const actorList = [result];
+          self.crawlDetails(actorList, resolve);
+        } catch (err) {
+          console.log(err);
+          reject(err);
+        }
+      }
+      mainProcess();
+    })
+  },
   crawlListPage(resolve) {
     try {
       const c = new Crawler({
@@ -53,15 +71,16 @@ const Helper = {
         },
       });
       c.queue(initFullUrl);
-      c.on('drain', () => {
+      c.on('drain', async () => {
         console.log(this.numPagesVisited, ' pages visited.');
-        this.crawlDetailsPage(resolve);
+        const actorList = await Actor.getAllActor();
+        this.crawlDetails(actorList, resolve);
       });
     } catch (error) {
       throw error;
     }
   },
-  async crawlDetailsPage(resolve) {
+  async crawlDetails(actorList, resolve) {
     try {
       const c = new Crawler({
         maxConnections: 10,
@@ -78,9 +97,8 @@ const Helper = {
           done();
         },
       });
-      const actorData = await Actor.getAllActor();
       var self = this;
-      actorData.map(actor => {
+      actorList.map(actor => {
         self.numPagesVisited += 1;
         c.queue([
           {
@@ -183,7 +201,7 @@ const Helper = {
         }
       });
     }
-    const updatedInfo = Object.assign(detailsInfo, actor);
+    const updatedInfo = Object.assign(actor, detailsInfo);
     // Update each successful record
     try {
       await Actor.updateSingleActor(updatedInfo);

@@ -13,7 +13,7 @@ router.get('/details/:actorId', async function (req, res) {
   console.log("Get Details");
   const { actorId } = req.params;
   try {
-    const result = await Actor.getActorsByActorId(actorId);
+    const result = await Actor.getActorByActorId(actorId);
     const actor = Object.assign(result, {
       thumbnail: `${baseUrl}/${result.thumbnail}`,
       detailUrl: `${baseUrl}/${result.detailUrl}`,

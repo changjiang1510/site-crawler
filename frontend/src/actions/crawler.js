@@ -7,6 +7,12 @@ const Actions = {
       payload,
     }
   },
+  crawlActorDetails(payload) {
+    return {
+      type: ActionTypes.CRAWL_ACTOR_DETAILS,
+      payload,
+    }
+  },
 }
 
 export default Actions
