@@ -12,6 +12,7 @@ export function* crawlActorList(action) {
     if (!responseResult.error) {
       const result = responseResult.data;
       yield put({ type: ActionTypes.CRAWL_ACTOR_LIST_SUCCESS, payload: result });
+      yield put({ type: ActionTypes.GET_ACTOR_LIST, payload: action.payload });
     } else {
       yield put({ type: ActionTypes.CRAWL_ACTOR_LIST_FAIL, payload: { error: 'Crawl failed' } });
     }
@@ -30,6 +31,7 @@ export function* crawlActorDetails(action) {
     if (!responseResult.error) {
       const result = responseResult.data;
       yield put({ type: ActionTypes.CRAWL_ACTOR_DETAILS_SUCCESS, payload: result });
+      yield put({ type: ActionTypes.GET_ACTOR, payload: action.payload });
     } else {
       yield put({ type: ActionTypes.CRAWL_ACTOR_DETAILS_FAIL, payload: { error: 'Crawl failed' } });
     }

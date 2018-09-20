@@ -27,7 +27,9 @@ router.get('/details/:actorId', async function (req, res) {
 
 router.get('/list', async function (req, res) {
   try {
-    const result = await Actor.getAllActor();
+    const filter = req.query;
+    console.log(filter);
+    const result = await Actor.getActorList(filter);
     const actorList = result.map(actor =>
       Object.assign(actor, {
         thumbnail: `${baseUrl}/${actor.thumbnail}`,

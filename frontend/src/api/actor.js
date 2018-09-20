@@ -15,7 +15,10 @@ const actorApi = {
   fetchActorList(payload) {
     const url = `${apiBaseURL}/api/actor/list`;
     return axios.get(
-      url
+      url,
+      {
+        params: payload.listFilter,
+      }
     );
   },
 }

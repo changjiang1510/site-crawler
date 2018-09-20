@@ -79,7 +79,7 @@ async function crawlDetailsPage() {
         done();
       },
     });
-    const actorData = await Actor.getAllActor();
+    const actorData = await Actor.getActorList();
     actorData.map(actor => {
       numPagesVisited += 1;
       c.queue([

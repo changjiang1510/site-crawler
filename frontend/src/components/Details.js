@@ -6,6 +6,7 @@ import DoneOutlined from '@material-ui/icons/DoneOutlined';
 
 import ActorActions from '../actions/actor';
 import CrawlerActions from '../actions/crawler';
+import FilterActions from '../actions/filter';
 
 const styles = theme => ({
   root: {
@@ -38,6 +39,9 @@ class Details extends Component {
     } = this.props;
     dispatch(ActorActions.getActor({ actorId }));
   }
+  componentWillReceiveProps() {
+    window.previousLocation = this.props.location;
+  }
   getDetailsFromStore() {
     const { actor } = this.props.store
     return actor.profile;
@@ -53,11 +57,29 @@ class Details extends Component {
         params: { actorId },
       }
     } = this.props;
-    this.props.dispatch(CrawlerActions.crawlActorDetails({ actorId }));
+    dispatch(CrawlerActions.crawlActorDetails({ actorId }));
   }
   handleTagClick(event, tag) {
-    const { target } = event;
-    console.log(tag);
+    const { history } = this.props
+    this.props.dispatch(FilterActions.setListFilter( { tag } ));
+    history.push({
+      pathname: `/list`,
+      state: {
+        from: this.props.location.pathname
+      }
+    });
+    // console.log(tag);
+  }
+  handleSizeClick(event, size) {
+    const { history } = this.props
+    this.props.dispatch(FilterActions.setListFilter({ size }));
+    history.push({
+      pathname: `/list`,
+      state: {
+        from: this.props.location.pathname
+      }
+    });
+    // console.log(size);
   }
   displayProgress() {
     const crawlStatus = this.getCrawlStatusFromStore();
@@ -102,6 +124,18 @@ class Details extends Component {
                 <Typography gutterBottom>
                   <a href={profile.detailUrl}>URL</a>
                 </Typography>
+                {profile.size ? (
+                  <Typography gutterBottom>
+                    <span>Size: </span>
+                    <Chip
+                      label={profile.size || ''}
+                      onClick={(e) => this.handleSizeClick(e, profile.size)}
+                      className={classes.chip}
+                      variant='outlined'
+                      component='span'
+                    />
+                  </Typography>
+                ) : ''}
                 {profile.tags ? (
                   <Typography color='textSecondary'>
                     <span>Tag: </span>

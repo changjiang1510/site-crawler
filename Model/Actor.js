@@ -10,10 +10,27 @@ var _init = function () {
   }
 }
 
-var _getAllActor = function () {
+var _getActorList = function (filterCond) {
   return new Promise(function (resolve, reject) {
     _init();
-    _actorDb.find({}).toArray((err, newDocs) => {
+    const searchCondition = {};
+    if (filterCond) {
+      if (filterCond.name && filterCond.name !== '') {
+        const nameRegEx = new RegExp(filterCond.name);
+        const orCond = [
+          { name: { $regex: nameRegEx, '$options': 'i' }},
+          { kanaName: { $regex: nameRegEx, '$options': 'i' }},
+        ];
+        searchCondition['$or'] = orCond;
+      }
+      if (filterCond.size && filterCond.size !== '') {
+        searchCondition.size = { '$regex': new RegExp(filterCond.size), '$options': 'i' };
+      }
+      if (filterCond.tag && filterCond.tag !== '') {
+        searchCondition.tags = { '$regex': new RegExp(filterCond.tag), '$options': 'i' };
+      }
+    }
+    _actorDb.find(searchCondition).toArray((err, newDocs) => {
       if (err) {
         console.log('error', err);
         reject(err);
@@ -91,7 +108,7 @@ var _getActorByActorId = function (actorId) {
   });
 }
 
-var _getActorsByActorIds = function (actorIds, resolve, reject) {
+var _getActorListByActorIds = function (actorIds, resolve, reject) {
   if (!_.isArray(actorIds)) {
     reject();
     return;
@@ -150,11 +167,11 @@ module.exports = {
   createTable: _createTable,
   dropTable: _dropTable,
   resetTable: _resetTable,
-  getAllActor: _getAllActor,
+  getActorList: _getActorList,
   deleteById: _deleteById,
   insertActors: _insertActors,
   updateMultipleActors: _updateMultipleActors,
   updateSingleActor: _updateSingleActor,
   getActorByActorId: _getActorByActorId,
-  getActorsByActorIds: _getActorsByActorIds,
+  getActorListByActorIds: _getActorListByActorIds,
 }

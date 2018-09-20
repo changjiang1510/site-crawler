@@ -73,7 +73,7 @@ const Helper = {
       c.queue(initFullUrl);
       c.on('drain', async () => {
         console.log(this.numPagesVisited, ' pages visited.');
-        const actorList = await Actor.getAllActor();
+        const actorList = await Actor.getActorList();
         this.crawlDetails(actorList, resolve);
       });
     } catch (error) {
@@ -198,6 +198,28 @@ const Helper = {
               rateCell.get(0).children[0].children[0].data,
             score: parseFloat(rateCell.get(1).children[0].data),
           });
+        }
+      });
+    }
+    const actProfile = $('div.act-profile');
+    if (actProfile.length > 0) {
+      const tagArea = actProfile.find('.tagarea');
+      if (tagArea.length > 0) {
+        const tags = [];
+        if (tagArea.length > 0) {
+          tagArea.find('a').each(function () {
+            tags.push($(this).text());
+          });
+        }
+        detailsInfo.tags = tags;
+      }
+      const infoFields = actProfile.find('td');
+      infoFields.each(function () {
+        const fieldName = $(this).get(0).children[0];
+        if (fieldName.name === 'span' && fieldName.children[0].data === 'サイズ') {
+          if ($(this).get(0).children[1] && $(this).get(0).children[1].children[1]) {
+            detailsInfo.size = $(this).get(0).children[1].children[1].children[0].data;
+          }
         }
       });
     }

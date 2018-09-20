@@ -8,7 +8,9 @@ import 'react-table/react-table.css'
 
 import ActorActions from '../actions/actor';
 import CrawlerActions from '../actions/crawler';
+import FilterActions from '../actions/filter';
 import TableRow from './TableRow';
+import SearchForm from './SearchForm';
 
 const styles = theme => ({
   progress: {
@@ -18,7 +20,13 @@ const styles = theme => ({
 
 class ActorList extends Component {
   componentDidMount() {
-    this.props.dispatch(ActorActions.getActorList());
+    if (this.props.location.state && this.props.location.state.from.indexOf('/details') !== -1) {
+      const { filter } = this.props.store;
+      this.props.dispatch(ActorActions.getActorList({ listFilter: filter.listFilter }));
+    } else {
+      this.props.dispatch(FilterActions.resetListFilter());
+      this.props.dispatch(ActorActions.getActorList({}));
+    }
   }
   getActorListFromStore() {
     const { actor } = this.props.store
@@ -28,8 +36,15 @@ class ActorList extends Component {
     const { crawler } = this.props.store
     return crawler.crawlStatus;
   }
+  getFilterFromStore() {
+    const { filter } = this.props.store
+    return filter.listFilter;
+  }
   triggerCrawler() {
     this.props.dispatch(CrawlerActions.crawlActorList());
+  }
+  handleFilter(newFilter) {
+    this.props.dispatch(ActorActions.getActorList({ listFilter: newFilter }));
   }
   navToDetails(event, actorInfo) {
     const { target } = event
@@ -86,6 +101,9 @@ class ActorList extends Component {
           </Button>
           {this.displayProgress()}
         </div>
+        <SearchForm
+          handleFilter={this.handleFilter.bind(this)}
+        />
         <ReactTable
           data={actorList}
           columns={columns}

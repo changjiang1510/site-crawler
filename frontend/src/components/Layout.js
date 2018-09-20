@@ -61,6 +61,12 @@ function ClippedDrawer(props) {
         <List>
           <ListItem
             button
+            to='/'
+            component={NavLink}>
+            <ListItemText primary="Home" />
+          </ListItem>
+          <ListItem
+            button
             to='/list'
             component={NavLink}>
             <ListItemText primary="Actor List" />
